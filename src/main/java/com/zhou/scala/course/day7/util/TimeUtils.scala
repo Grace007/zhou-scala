@@ -3,9 +3,7 @@ package com.zhou.scala.course.day7.util
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-/**
-  * Created by root on 2016/5/23.
-  */
+
 object TimeUtils {
 
   val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

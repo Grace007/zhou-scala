@@ -4,9 +4,7 @@ import java.net.URL
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by root on 2016/5/16.
-  */
+
 object UrlCount {
 
   def main(args: Array[String]) {

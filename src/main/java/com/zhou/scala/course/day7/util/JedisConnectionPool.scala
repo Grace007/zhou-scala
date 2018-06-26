@@ -2,9 +2,7 @@ package com.zhou.scala.course.day7.util
 
 import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig}
 
-/**
-  * Created by root on 2016/5/24.
-  */
+
 object JedisConnectionPool{
 
   val config = new JedisPoolConfig()

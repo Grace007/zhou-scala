@@ -4,9 +4,7 @@ import java.sql.{Connection, Date, DriverManager, PreparedStatement}
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by root on 2016/5/18.
-  */
+
 object IPLocation {
 
 

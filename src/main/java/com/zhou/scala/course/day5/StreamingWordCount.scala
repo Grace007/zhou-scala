@@ -3,8 +3,9 @@ package com.zhou.scala.course.day5
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
+
 /**
-  * Created by root on 2016/5/21.
+  * 结果不能累加
   */
 object StreamingWordCount {
 

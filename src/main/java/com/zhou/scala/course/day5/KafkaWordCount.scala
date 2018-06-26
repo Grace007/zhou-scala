@@ -5,11 +5,13 @@ import org.apache.spark.{HashPartitioner, SparkConf}
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
-/**
-  * Created by root on 2016/5/21.
-  */
-object KafkaWordCount {
 
+object KafkaWordCount {
+  /**
+    * String:单词
+    * Seq[Int]:单词在当前批次出现的次数
+    * Option[Int]:历史结果
+    */
   val updateFunc = (iter: Iterator[(String, Seq[Int], Option[Int])]) => {
     //iter.flatMap(it=>Some(it._2.sum + it._3.getOrElse(0)).map(x=>(it._1,x)))
     iter.flatMap { case (x, y, z) => Some(y.sum + z.getOrElse(0)).map(i => (x, i)) }

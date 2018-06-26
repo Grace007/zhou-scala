@@ -2,9 +2,7 @@ package com.zhou.scala.course.day1
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by root on 2016/5/14.
-  */
+
 object WordCount {
   def main(args: Array[String]) {
     //非常重要，是通向Spark集群的入口

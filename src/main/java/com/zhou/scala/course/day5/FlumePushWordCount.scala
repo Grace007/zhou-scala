@@ -4,9 +4,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.flume.FlumeUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
-/**
-  * Created by ZX on 2015/6/22.
-  */
+
 object FlumePushWordCount {
 
   def main(args: Array[String]) {

@@ -5,9 +5,7 @@ import java.sql.DriverManager
 import org.apache.spark.rdd.JdbcRDD
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by ZX on 2016/4/12.
-  */
+
 object JdbcRDDDemo {
 
   def main(args: Array[String]) {

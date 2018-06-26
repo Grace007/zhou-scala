@@ -3,9 +3,6 @@ package com.zhou.scala.course.day5
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
 
-/**
-  * Created by root on 2016/5/21.
-  */
 object StateFulWordCount {
 
 

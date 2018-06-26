@@ -3,9 +3,7 @@ package com.zhou.scala.course.day5
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{Milliseconds, Seconds, StreamingContext}
 
-/**
-  * Created by ZX on 2016/4/19.
-  */
+
 object WindowOpts {
 
   def main(args: Array[String]) {

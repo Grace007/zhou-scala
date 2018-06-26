@@ -2,9 +2,7 @@ package com.zhou.scala.course.day2
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
-  * Created by root on 2016/5/16.
-  */
+
 object ForeachDemo {
 
   def main(args: Array[String]) {

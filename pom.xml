@@ -72,6 +72,24 @@
             <version>${spark.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-repl -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_2.10</artifactId>
+            <!--<version>1.4.1</version>-->
+            <version>${spark.version}</version>
+<!--            <scope>provided</scope>-->
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.scalanlp/breeze -->
+        <dependency>
+            <groupId>org.scalanlp</groupId>
+            <artifactId>breeze_2.10</artifactId>
+            <version>0.12</version>
+        </dependency>
+
+
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming-kafka_2.10</artifactId>

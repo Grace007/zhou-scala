@@ -9,23 +9,24 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object RDDApi {
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("RDDAPI")
+    val conf = new SparkConf().setAppName("RDDAPI").setMaster("local[3]");
     val sc = new SparkContext(conf)
 
 
+//    aggregateByKeyDemo(sc);
 //    aggregateDemo(sc);
-//    combineByKeyDemo(sc);
+    combineByKeyDemo(sc);
 //    combineByKeyDemo01(sc)
 //    combineByKeyDemo02(sc)
 //    countByKeyDemo(sc)
 //    filterByRangeDemo(sc)
 //    flatMapValuesDemo(sc)
 //    foldByKeyDemo(sc)
-    foreachPartitionDemo(sc)
+//    foreachPartitionDemo(sc)
   }
 
   /**
-    * 实现mapPartitionsWithIndex的参数函数
+    * 实现mapPartitionsWithIndex的参数函数 需要实现f: (Int, Iterator[T]) => Iterator[U],
     * 把每个partition中的分区号和对应的值拿出来
     */
   val func_mapPartitionsWithIndex = (index: Int, iter: Iterator[(Int)]) => {
@@ -39,46 +40,65 @@ object RDDApi {
   def aggregateDemo(sc : SparkContext) : Unit = {
     val rdd1 = sc.parallelize(List(1,2,3,4,5,6,7,8,9),2)
     val rdd101 = rdd1.mapPartitionsWithIndex(func_mapPartitionsWithIndex).collect()
-    //    rdd101.foreach(println)
-    val sum102 = rdd1.aggregate(0)(_+_,_+_)
-    //    println(sum102)
+        rdd101.foreach(println)
+    val sum102 = rdd1.aggregate(0)(_+_,_+_) //45
+        println(sum102)
 
-    //类似map+reduce操作,map是并行化的,会导致结果不同(注意是string)
+    //类似map+reduce操作,map是并行化的,会导致结果不同(注意是string),其中map的操作也是类似队列那种思想的操作
+    //第一个参数是初始值(对于每一个分区而言), 二:是2个函数[每个函数都是2个参数(第一个参数:先对个个分区进行合并, 第二个:对个个分区合并后的结果再进行合并)
+    //其中还有一个坑:map端迭代的操作每次都是int转化成String,要注意
     val rdd2 = sc.parallelize(List("12","23","345","4567"),2)
     val result_201 = rdd2.aggregate("")((x,y) => math.max(x.length, y.length).toString ,(x,y) => x + y)
-    //24 or 42
-    //    println(result_201)
+    //24 or 42  原因:"12","23"在同一个分区,"345","4567"在同一个分区 (分区按照了list的index顺序),第二个阶段(reduce合并) map是并行,所以使得两个数字顺序有所不同  如果有两个分区,则对应2个数字, 三个分区则对应三个数字
+        println(result_201)
 
     val rdd4 = sc.parallelize(List("12","23","345",""),2)
     val result_401 =rdd4.aggregate("")((x,y) => math.min(x.length, y.length).toString, (x,y) => x + y)
     //01 or 10
-    //    println(result_401)
+        println(result_401)
 
     val rdd5 = sc.parallelize(List("12","23","","345"),2)
     val result_501 =rdd5.aggregate("")((x,y) => math.min(x.length, y.length).toString, (x,y) => x + y)
-    //    println(result_501)
+        println(result_501)
 
-    val pairRDD = sc.parallelize(List( ("cat",2), ("cat", 5), ("mouse", 4),("cat", 12), ("dog", 12), ("mouse", 2)), 2)
-    val result_pairRDD01 = pairRDD.mapPartitionsWithIndex(func2).collect();
-    //    result_pairRDD01.foreach(println)
-    //    println("##########")
-    val result_pairRDD02 =  pairRDD.aggregateByKey(0)(math.max(_, _), _ + _).collect()
-    //    result_pairRDD02.foreach(println)
 
-    val result_pairRDD03 = pairRDD.aggregateByKey(100)(math.max(_, _), _ + _).collect()
-    //    result_pairRDD03.foreach(println)
   }
 
+  def aggregateByKeyDemo(sc : SparkContext) : Unit = {
+    val rdd1 = sc.parallelize(List((1, 3), (1, 2), (1, 4), (2, 3)));
+    val rdd2 = rdd1.aggregateByKey(10)(Math.max(_,_),_+_);
+      rdd2.foreach(println);  //(2,3) (1,7)
+
+    //分区的划分还是按照顺序,
+    //aggregate针对一维,aggregateByKey可以操作二维
+    val pairRDD = sc.parallelize(List( ("cat",4), ("cat", 5), ("mouse", 4),("cat", 12), ("dog", 12), ("mouse", 2)), 2)
+    val result_pairRDD01 = pairRDD.mapPartitionsWithIndex(func2).collect();
+      result_pairRDD01.foreach(println)
+      println("##########")
+    val result_pairRDD02 =  pairRDD.aggregateByKey(0)(math.max(_, _), _ + _).collect()
+      result_pairRDD02.foreach(println)
+
+    val result_pairRDD03 = pairRDD.aggregateByKey(100)(math.max(_, _), _ + _).collect()
+      result_pairRDD03.foreach(println)
+  }
+
+  /**
+    * combineByKey : 和reduceByKey是相同的效果
+    * ###第一个参数x:原封不动取出来, 第二个参数:是函数, 局部运算, 第三个:是函数, 对局部运算后的结果再做运算
+    * ###每个分区中每个key中value中的第一个值, (hello,1)(hello,1)(good,1)-->(hello(1,1),good(1))-->x就相当于hello的第一个1, good中的1
+    * @param sc
+    */
   def combineByKeyDemo(sc : SparkContext)  : Unit ={
     val rdd1 = sc.textFile("file:///E:\\Test\\bigdata\\spark\\wordcount.log").flatMap(_.split(" ")).map((_, 1))
     val rdd2 = rdd1.combineByKey(x => x, (a: Int, b: Int) => a + b, (m: Int, n: Int) => m + n)
     val result_rdd1 = rdd1.collect
     val result_rdd2 = rdd2.collect
 
-    //    result_rdd1.foreach(println)
-//    result_rdd2.foreach(println)
+        result_rdd1.foreach(println)
+        result_rdd2.foreach(println)
 
     //###当input下有3个文件时(有3个block块, 不是有3个文件就有3个block, ), 每个会多加3个10
+    //本例子中有一个文件,原来有13个单词,但是结果显示是33,推测是有两个分区对应两个block,分区内各+10,结果就多加20.
     val rdd3 = rdd1.combineByKey(x => x + 10, (a: Int, b: Int) => a + b, (m: Int, n: Int) => m + n)
     val result_rdd3=rdd3.collect()
 //    result_rdd3.foreach(println)
